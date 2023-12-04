@@ -26,7 +26,7 @@ public class StatsClient extends BaseClient {
                 .app(app)
                 .uri(uri)
                 .ip(ip)
-                .timestamp(timestamp));
+                .timestamp(timestamp.toString()));
     }
 
     public ResponseEntity<Object> getViewStats(String start, String end, String[] uris, boolean unique) {
