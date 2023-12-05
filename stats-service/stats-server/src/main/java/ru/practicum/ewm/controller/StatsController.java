@@ -19,6 +19,12 @@ import java.util.List;
 public class StatsController {
     private final StatsService statsService;
 
+    /**
+     * Запрос на создание EndPointa
+     *
+     * @param endPointHitDto EndPoint
+     * @return Подтверждение создания EndPoint
+     */
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public String postEndPointHit(@RequestBody @Valid EndPointHitDto endPointHitDto) {
@@ -26,6 +32,15 @@ public class StatsController {
         return statsService.postEndPointHit(endPointHitDto);
     }
 
+    /**
+     * Вывод статистики по EndPoint
+     *
+     * @param start  Начало временного промежутка
+     * @param end    Конец временного промежутка
+     * @param uris   URI
+     * @param unique Уникальные посещения
+     * @return Статистика посещения
+     */
     @GetMapping("/stats")
     public List<ViewStatsDto> getViewStats(@RequestParam(name = "start") String start,
                                            @RequestParam(name = "end") String end,
