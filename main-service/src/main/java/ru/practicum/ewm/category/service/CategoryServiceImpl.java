@@ -32,8 +32,8 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryRepository.findFirstByName(newCategoryDto.getName()) != null) {
             throw new DuplicateCategoryNameException();
         }
-        return CategoryMapper.toCategoryDto(categoryRepository.
-                save(CategoryMapper.newCategoryDtoToCategory(newCategoryDto)));
+        return CategoryMapper.toCategoryDto(categoryRepository
+                .save(CategoryMapper.newCategoryDtoToCategory(newCategoryDto)));
     }
 
     /**

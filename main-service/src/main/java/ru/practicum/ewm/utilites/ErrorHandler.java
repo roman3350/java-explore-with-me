@@ -24,18 +24,18 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({UserNotInitiatorException.class, IncorrectParticipantLimitException.class, IncorrectStateActionException.class,
-    StatusNotConfirmedOrRejectedException.class, ChangePublishedEventException.class, ParticipantLimitReachedException.class,
+            StatusNotConfirmedOrRejectedException.class, ChangePublishedEventException.class, ParticipantLimitReachedException.class,
             StatusNotPendingException.class, DuplicateCategoryNameException.class, DuplicateUserNameException.class,
             CategoryNotEmptyException.class, UserSentRequestCurrentEventException.class, UserInitiatorEventException.class,
             EventNotPublishedException.class, NoEmptyPlaceEventException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictException(Throwable e){
+    public ErrorResponse handleConflictException(Throwable e) {
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler({IncorrectEventDateException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequestException(Throwable e){
+    public ErrorResponse handleBadRequestException(Throwable e) {
         return new ErrorResponse(e.getMessage());
     }
 }
