@@ -43,7 +43,7 @@ public class StatsServiceImpl implements StatsService {
     public List<ViewStatsDto> getViewStats(String start, String end, String[] uris, boolean unique) {
         LocalDateTime startDataTime = LocalDateTime.parse(start, FORMATTER);
         LocalDateTime endDataTime = LocalDateTime.parse(end, FORMATTER);
-        if (startDataTime.isAfter(endDataTime)){
+        if (startDataTime.isAfter(endDataTime)) {
             throw new IncorrectDataException();
         }
         if (uris != null && unique) {
