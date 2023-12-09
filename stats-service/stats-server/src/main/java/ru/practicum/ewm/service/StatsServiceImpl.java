@@ -2,8 +2,10 @@ package ru.practicum.ewm.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.EndPointHitDto;
 import ru.practicum.ewm.ViewStatsDto;
+import ru.practicum.ewm.EndPointHitDto;
+import ru.practicum.ewm.exception.IncorrectDataException;
+import ru.practicum.ewm.model.EndPointHit;
 import ru.practicum.ewm.model.EndPointHitMapper;
 import ru.practicum.ewm.repository.StatsRepository;
 
@@ -24,9 +26,8 @@ public class StatsServiceImpl implements StatsService {
      * @return Подтверждение создания EndPoint
      */
     @Override
-    public String postEndPointHit(EndPointHitDto endPointHitDto) {
-        statsRepository.save(EndPointHitMapper.toEndpointHit(endPointHitDto));
-        return "Информация сохранена";
+    public EndPointHit postEndPointHit(EndPointHitDto endPointHitDto) {
+        return statsRepository.save(EndPointHitMapper.toEndpointHit(endPointHitDto));
     }
 
     /**
@@ -42,6 +43,9 @@ public class StatsServiceImpl implements StatsService {
     public List<ViewStatsDto> getViewStats(String start, String end, String[] uris, boolean unique) {
         LocalDateTime startDataTime = LocalDateTime.parse(start, FORMATTER);
         LocalDateTime endDataTime = LocalDateTime.parse(end, FORMATTER);
+        if (startDataTime.isAfter(endDataTime)){
+            throw new IncorrectDataException();
+        }
         if (uris != null && unique) {
             return statsRepository.getStatsUriAndUnique(startDataTime, endDataTime, List.of(uris));
         }
@@ -51,6 +55,7 @@ public class StatsServiceImpl implements StatsService {
         if (unique) {
             return statsRepository.getStatsUnique(startDataTime, endDataTime);
         }
+
         return statsRepository.getStats(startDataTime, endDataTime);
     }
 }
