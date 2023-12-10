@@ -1,5 +1,7 @@
 package ru.practicum.ewm.event.service;
 
+import ru.practicum.ewm.comment.dto.CommentDto;
+import ru.practicum.ewm.comment.dto.NewCommentDto;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.model.SearchAdmin;
 import ru.practicum.ewm.event.model.SearchUser;
@@ -70,6 +72,41 @@ public interface EventService {
                                                                  EventRequestStatusUpdateRequest request);
 
     /**
+     * Добавление комментария пользователем
+     *
+     * @param userId  ID пользователя
+     * @param eventId ID комментария
+     * @param comment комментарий
+     * @return Добавленный комментарий
+     */
+    CommentDto postComment(long userId, long eventId, NewCommentDto comment);
+
+    /**
+     * Изменение комментария
+     *
+     * @param userId    ID пользователя
+     * @param commentId ID комментария
+     * @param comment   Данные на изменения
+     * @return Изменённый комментарий
+     */
+    CommentDto patchComment(long userId, long commentId, NewCommentDto comment);
+
+    /**
+     * Удаление комментария
+     *
+     * @param userId    ID пользователя
+     * @param commentId ID комментария
+     */
+    void deleteComment(long userId, long commentId);
+
+    /**
+     * Удаление комментария админом
+     *
+     * @param commentId ID комментария
+     */
+    void deleteCommentByAdmin(long commentId);
+
+    /**
      * Поиск событий админом по критериям
      *
      * @param searchAdmin Критерии
@@ -103,4 +140,12 @@ public interface EventService {
      * @return Событие
      */
     EventFullDto getEventId(long eventId, HttpServletRequest request);
+
+    /**
+     * Вывод комментариев события
+     *
+     * @param eventId ID события
+     * @return Комментарии события
+     */
+    List<CommentDto> getComments(long eventId);
 }
