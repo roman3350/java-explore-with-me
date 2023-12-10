@@ -1,7 +1,8 @@
 package ru.practicum.ewm.service;
 
-import ru.practicum.ewm.EndPointHitDto;
 import ru.practicum.ewm.ViewStatsDto;
+import ru.practicum.ewm.EndPointHitDto;
+import ru.practicum.ewm.model.EndPointHit;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface StatsService {
      * @param endPointHitDto EndPoint
      * @return Подтверждение создания EndPoint
      */
-    String postEndPointHit(EndPointHitDto endPointHitDto);
+    EndPointHit postEndPointHit(EndPointHitDto endPointHitDto);
 
     /**
      * Вывод статистики по EndPoint
