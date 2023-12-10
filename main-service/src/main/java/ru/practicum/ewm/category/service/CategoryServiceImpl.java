@@ -80,7 +80,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryDto> getCategory(int from, int size) {
         PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
-        categoryRepository.findAll(page);
         return CategoryMapper.toCategoryDto(categoryRepository.findAll(page).getContent());
     }
 
