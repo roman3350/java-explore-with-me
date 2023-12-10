@@ -7,590 +7,6 @@
 	},
 	"item": [
 		{
-			"name": "Добавление нового пользователя",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const api = new API(pm);\r",
-							"    const rnd = new RandomUtils();\r",
-							"\r",
-							"    let user;\r",
-							"    try {\r",
-							"        user = rnd.getUser();\r",
-							"    } catch(err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-							"    }\r",
-							"\r",
-							"    pm.request.body.update({\r",
-							"        mode: 'raw',\r",
-							"        raw: JSON.stringify(user),\r",
-							"        options: { raw: { language: 'json' } }\r",
-							"    });\r",
-							"};\r",
-							"\r",
-							"const interval = setInterval(() => {}, 1000);\r",
-							"\r",
-							"setTimeout(async () => \r",
-							"    {\r",
-							"        try {\r",
-							"            await main();\r",
-							"        } catch (e) {\r",
-							"            console.error(e);\r",
-							"        } finally {\r",
-							"            clearInterval(interval);\r",
-							"        }\r",
-							"    },  \r",
-							"    100 \r",
-							");"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const source = JSON.parse(pm.request.body.raw);\r",
-							"const target = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Пользователь должен содержать поля: id, name, email\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('name');\r",
-							"pm.expect(target).to.have.property('email');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-							"    pm.expect(target.id).to.not.be.null;\r",
-							"    pm.expect(source.name).equal(target.name, 'Имя пользователя должно соответствовать отправленному в запросе');\r",
-							"    pm.expect(source.email).equal(target.email, 'Почта пользователя должна соответствовать отправленной в запросе');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{{request_body}}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/users",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Добавление новой подборки",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const api = new API(pm);\r",
-							"    const rnd = new RandomUtils();\r",
-							"\r",
-							"    let compilation;\r",
-							"    try {\r",
-							"        const user = await api.addUser(rnd.getUser());\r",
-							"        const category = await api.addCategory(rnd.getCategory());\r",
-							"        const event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-							"        compilation = rnd.getCompilation(event.id);\r",
-							"    } catch(err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-							"    }\r",
-							"\r",
-							"    pm.request.body.update({\r",
-							"        mode: 'raw',\r",
-							"        raw: JSON.stringify(compilation),\r",
-							"        options: { raw: { language: 'json' } }\r",
-							"    });\r",
-							"};\r",
-							"\r",
-							"const interval = setInterval(() => {}, 1000);\r",
-							"\r",
-							"setTimeout(async () => \r",
-							"    {\r",
-							"        try {\r",
-							"            await main();\r",
-							"        } catch (e) {\r",
-							"            console.error(e);\r",
-							"        } finally {\r",
-							"            clearInterval(interval);\r",
-							"        }\r",
-							"    },  \r",
-							"    100 \r",
-							");"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const source = JSON.parse(pm.request.body.raw);\r",
-							"const target = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Подборка должны содержать поля: id, title, pinned, events\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('title');\r",
-							"pm.expect(target).to.have.property('pinned');\r",
-							"pm.expect(target).to.have.property('events');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-							"    pm.expect(target.id).to.not.be.null;\r",
-							"    pm.expect(target.title).to.be.a(\"string\");\r",
-							"    pm.expect(target.events).to.be.an(\"array\");\r",
-							"\r",
-							"    pm.expect(source.events[0]).equal(target.events[0].id, 'Идентификаторы событий в подборке должен быть идентичен идентификаторам, указанным при создании подборки ');\r",
-							"    pm.expect(source.title).equal(target.title, 'Название подборки должно соответствовать указанному при создании');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/compilations",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"compilations"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Добавление новой категории",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const api = new API(pm);\r",
-							"    const rnd = new RandomUtils();\r",
-							"\r",
-							"    let category;\r",
-							"    try {\r",
-							"        category = rnd.getCategory();\r",
-							"    } catch(err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-							"    }\r",
-							"\r",
-							"    pm.request.body.update({\r",
-							"        mode: 'raw',\r",
-							"        raw: JSON.stringify(category),\r",
-							"        options: { raw: { language: 'json' } }\r",
-							"    });\r",
-							"};\r",
-							"\r",
-							"const interval = setInterval(() => {}, 1000);\r",
-							"\r",
-							"setTimeout(async () => \r",
-							"    {\r",
-							"        try {\r",
-							"            await main();\r",
-							"        } catch (e) {\r",
-							"            console.error(e);\r",
-							"        } finally {\r",
-							"            clearInterval(interval);\r",
-							"        }\r",
-							"    },  \r",
-							"    100 \r",
-							");"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-							"    pm.response.to.have.status(201);\r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const source = JSON.parse(pm.request.body.raw);\r",
-							"const target = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Категория должна содержать поля: id, name\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('name');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-							"    pm.expect(target.id).to.not.be.null;\r",
-							"    pm.expect(source.name).equal(target.name, 'Название категории должно совпадать с отправленным');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{{request_body}}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/categories",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"categories"
-					]
-				},
-				"description": "Обратите внимание: имя категории должно быть уникальным"
-			},
-			"response": []
-		},
-		{
-			"name": "Добавление нового события",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const api = new API(pm);\r",
-							"    const rnd = new RandomUtils();\r",
-							"\r",
-							"    let event;\r",
-							"    try {\r",
-							"        const user = await api.addUser(rnd.getUser());\r",
-							"        pm.collectionVariables.set(\"uid\", user.id)\r",
-							"        const category = await api.addCategory(rnd.getCategory());\r",
-							"        event = rnd.getEvent(category.id);\r",
-							"    } catch(err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-							"    }\r",
-							"\r",
-							"    pm.request.body.update({\r",
-							"        mode: 'raw',\r",
-							"        raw: JSON.stringify(event),\r",
-							"        options: { raw: { language: 'json' } }\r",
-							"    });\r",
-							"};\r",
-							"\r",
-							"const interval = setInterval(() => {}, 1000);\r",
-							"\r",
-							"setTimeout(async () => \r",
-							"    {\r",
-							"        try {\r",
-							"            await main();\r",
-							"        } catch (e) {\r",
-							"            console.error(e);\r",
-							"        } finally {\r",
-							"            clearInterval(interval);\r",
-							"        }\r",
-							"    },  \r",
-							"    100 \r",
-							");"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-							"    pm.response.to.have.status(201);  \r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const source = JSON.parse(pm.request.body.raw);\r",
-							"const target = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, description, participantLimit, state, createdOn, location, requestModeration\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('title');\r",
-							"pm.expect(target).to.have.property('annotation');\r",
-							"pm.expect(target).to.have.property('category');\r",
-							"pm.expect(target).to.have.property('paid');\r",
-							"pm.expect(target).to.have.property('eventDate');\r",
-							"pm.expect(target).to.have.property('initiator');\r",
-							"pm.expect(target).to.have.property('description');\r",
-							"pm.expect(target).to.have.property('participantLimit');\r",
-							"pm.expect(target).to.have.property('state');\r",
-							"pm.expect(target).to.have.property('createdOn');\r",
-							"pm.expect(target).to.have.property('location');\r",
-							"pm.expect(target).to.have.property('requestModeration');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-							"    pm.expect(target.id).to.not.be.null;\r",
-							"    pm.expect(target.title).equal(source.title, 'Название события должно соответствовать названию события в запросе');\r",
-							"    pm.expect(target.annotation).equal(source.annotation, 'Аннотация события должна соответствовать аннотации события в запросе');\r",
-							"    pm.expect(target.paid.toString()).equal(source.paid.toString(), 'Стоимость события должна соответствовать стоимости события в запросе');\r",
-							"    pm.expect(target.eventDate).equal(source.eventDate, 'Дата проведения события должна соответствовать дате проведения события в запросе');\r",
-							"    pm.expect(target.description).equal(source.description, 'Описание события должно соответствовать описание события в запросе');\r",
-							"    pm.expect(target.participantLimit.toString()).equal(source.participantLimit.toString(), 'Лимит участников события должно соответствовать лимиту участников события в запросе');\r",
-							"    pm.expect(target.location.lat.toString()).equal(source.location.lat.toString(), 'Широта локации проведения события должна соответствовать широте локации проведения события в запросе');\r",
-							"    pm.expect(target.location.lon.toString()).equal(source.location.lon.toString(), 'Долгота локации проведения события должна соответствовать долготе локации проведения события в запросе');\r",
-							"    pm.expect(target.requestModeration.toString()).equal(source.requestModeration.toString(), 'Необходимость модерации события должна соответствовать необходимости модерации события в запросе');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{{request_body}}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/users/:userId/events",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"users",
-						":userId",
-						"events"
-					],
-					"variable": [
-						{
-							"key": "userId",
-							"value": "{{uid}}",
-							"description": "(Required) id текущего пользователя"
-						}
-					]
-				},
-				"description": "Обратите внимание: дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента"
-			},
-			"response": []
-		},
-		{
-			"name": "Редактирование данных события и его статуса (отклонение/публикация).",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const api = new API(pm);\r",
-							"    const rnd = new RandomUtils();\r",
-							"\r",
-							"    try {\r",
-							"        const user = await api.addUser(rnd.getUser());\r",
-							"        const category = await api.addCategory(rnd.getCategory());\r",
-							"        let event = await api.addEvent(user.id, rnd.getEvent(category.id));\r",
-							"        let event2 = rnd.getEvent(category.id)\r",
-							"        event2.stateAction = \"PUBLISH_EVENT\"\r",
-							"        pm.collectionVariables.set('response', event2);\r",
-							"        pm.collectionVariables.set(\"eid\", event.id)\r",
-							"        pm.request.body.update({\r",
-							"            mode: 'raw',\r",
-							"            raw: event2,\r",
-							"            options: { raw: { language: 'json' } }\r",
-							"        });\r",
-							"    } catch(err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-							"    }\r",
-							"};\r",
-							"\r",
-							"const interval = setInterval(() => {}, 1000);\r",
-							"\r",
-							"setTimeout(async () => \r",
-							"    {\r",
-							"        try {\r",
-							"            // выполняем наш скрипт\r",
-							"            await main();\r",
-							"        } catch (e) {\r",
-							"            console.error(e);\r",
-							"        } finally {\r",
-							"            clearInterval(interval);\r",
-							"        }\r",
-							"    },  \r",
-							"    100 \r",
-							");"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-							"    pm.response.to.be.ok;    \r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const source = pm.collectionVariables.get('response');\r",
-							"const target = pm.response.json();\r",
-							"\r",
-							"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, description, participantLimit, state, createdOn, publishedOn, location, requestModeration\", function () {\r",
-							"pm.expect(target).to.have.property('id');\r",
-							"pm.expect(target).to.have.property('title');\r",
-							"pm.expect(target).to.have.property('annotation');\r",
-							"pm.expect(target).to.have.property('category');\r",
-							"pm.expect(target).to.have.property('paid');\r",
-							"pm.expect(target).to.have.property('eventDate');\r",
-							"pm.expect(target).to.have.property('initiator');\r",
-							"pm.expect(target).to.have.property('description');\r",
-							"pm.expect(target).to.have.property('participantLimit');\r",
-							"pm.expect(target).to.have.property('state');\r",
-							"pm.expect(target).to.have.property('createdOn');\r",
-							"pm.expect(target).to.have.property('publishedOn');\r",
-							"pm.expect(target).to.have.property('location');\r",
-							"pm.expect(target).to.have.property('requestModeration');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-							"    pm.expect(source.annotation).equal(target.annotation, 'Аннотация события должна соответствовать искомому событию');\r",
-							"    pm.expect(source.paid.toString()).equal(target.paid.toString(), 'Стоимость события должна соответствовать искомому событию');\r",
-							"    pm.expect(source.eventDate).equal(target.eventDate, 'Дата проведения события должна соответствовать искомому событию');\r",
-							"    pm.expect(source.description).equal(target.description, 'Описание события должно соответствовать искомому событию');\r",
-							"    pm.expect(source.title).equal(target.title, 'Название события должно соответствовать искомому событию');\r",
-							"    pm.expect(source.participantLimit.toString()).equal(target.participantLimit.toString(), 'Лимит участников события должен соответствовать искомому событию');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{{request_body}}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/admin/events/:eventId",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"events",
-						":eventId"
-					],
-					"variable": [
-						{
-							"key": "eventId",
-							"value": "{{eid}}",
-							"description": "(Required) id события"
-						}
-					]
-				},
-				"description": "Обратите внимание:\n - дата начала события должна быть не ранее чем за час от даты публикации.\n- событие должно быть в состоянии ожидания публикации"
-			},
-			"response": []
-		},
-		{
 			"name": "Добавление комментария в неопубликованное событие",
 			"event": [
 				{
@@ -665,13 +81,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/user/99/events/3/comment",
+					"raw": "{{baseUrl}}/user/999/events/3/comment",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"user",
-						"99",
+						"999",
 						"events",
 						"3",
 						"comment"
@@ -721,7 +137,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/user/1/events/3/comment",
+					"raw": "{{baseUrl}}/user/1/events/2/comment",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -729,7 +145,7 @@
 						"user",
 						"1",
 						"events",
-						"3",
+						"2",
 						"comment"
 					]
 				}
@@ -810,13 +226,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/user/99/comment/1",
+					"raw": "{{baseUrl}}/user/999/comment/1",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"user",
-						"99",
+						"999",
 						"comment",
 						"1"
 					]
@@ -956,13 +372,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/events/99/comments",
+					"raw": "{{baseUrl}}/events/999/comments",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"events",
-						"99",
+						"999",
 						"comments"
 					]
 				}
@@ -1007,13 +423,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/events/3/comments",
+					"raw": "{{baseUrl}}/events/2/comments",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"events",
-						"3",
+						"2",
 						"comments"
 					]
 				}
@@ -1048,13 +464,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/user/99/comment/1",
+					"raw": "{{baseUrl}}/user/999/comment/1",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"user",
-						"99",
+						"999",
 						"comment",
 						"1"
 					]
@@ -1272,7 +688,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/user/1/events/3/comment",
+					"raw": "{{baseUrl}}/user/1/events/2/comment",
 					"host": [
 						"{{baseUrl}}"
 					],
@@ -1280,7 +696,7 @@
 						"user",
 						"1",
 						"events",
-						"3",
+						"2",
 						"comment"
 					]
 				}
