@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.comment.dto.CommentDto;
+import ru.practicum.ewm.comment.dto.NewCommentDto;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.model.SearchAdmin;
 import ru.practicum.ewm.event.model.SearchUser;
@@ -119,6 +121,66 @@ public class EventController {
     }
 
     /**
+     * Добавление комментария пользователем
+     *
+     * @param userId  ID пользователя
+     * @param eventId ID комментария
+     * @param comment комментарий
+     * @return Добавленный комментарий
+     */
+    @PostMapping("/user/{userId}/events/{eventId}/comment")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto postComment(@PathVariable long userId,
+                                  @PathVariable long eventId,
+                                  @Valid @RequestBody NewCommentDto comment) {
+        log.info("Добавление комментария пользователем с ID={}, событию с ID={}, комментарий {}",
+                userId, eventId, comment);
+        return eventService.postComment(userId, eventId, comment);
+    }
+
+    /**
+     * Изменение комментария
+     *
+     * @param userId    ID пользователя
+     * @param commentId ID комментария
+     * @param comment   Данные на изменения
+     * @return Изменённый комментарий
+     */
+    @PatchMapping("/user/{userId}/comment/{commentId}")
+    public CommentDto patchComment(@PathVariable long userId,
+                                   @PathVariable long commentId,
+                                   @Valid @RequestBody NewCommentDto comment) {
+        log.info("Изменение комментария с ID={}, пользователем с ID={}, комментарий {}", commentId, userId, comment);
+        return eventService.patchComment(userId, commentId, comment);
+    }
+
+    /**
+     * Удаление комментария
+     *
+     * @param userId    ID пользователя
+     * @param commentId ID комментария
+     */
+    @DeleteMapping("/user/{userId}/comment/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable long userId,
+                              @PathVariable long commentId) {
+        log.info("Удаление комментария с ID={}, пользователем с ID={}", commentId, userId);
+        eventService.deleteComment(userId, commentId);
+    }
+
+    /**
+     * Удаление комментария админом
+     *
+     * @param commentId ID комментария
+     */
+    @DeleteMapping("/admin/comment/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCommentByAdmin(@PathVariable long commentId) {
+        log.info("Удаление комментария с ID={}", commentId);
+        eventService.deleteCommentByAdmin(commentId);
+    }
+
+    /**
      * Поиск событий админом по критериям
      *
      * @param users      Пользователи
@@ -213,5 +275,17 @@ public class EventController {
                                    HttpServletRequest request) {
         log.info("Получение информации о событии с ID={}", eventId);
         return eventService.getEventId(eventId, request);
+    }
+
+    /**
+     * Вывод комментариев события
+     *
+     * @param eventId ID события
+     * @return Комментарии события
+     */
+    @GetMapping("/events/{eventId}/comments")
+    public List<CommentDto> getComments(@PathVariable long eventId) {
+        log.info("Вывод комментариев события с ID={}", eventId);
+        return eventService.getComments(eventId);
     }
 }

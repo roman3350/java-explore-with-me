@@ -9,6 +9,13 @@ import ru.practicum.ewm.StatsClient;
 import ru.practicum.ewm.category.exception.CategoryNotFoundException;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
+import ru.practicum.ewm.comment.dto.CommentDto;
+import ru.practicum.ewm.comment.dto.CommentMapper;
+import ru.practicum.ewm.comment.dto.NewCommentDto;
+import ru.practicum.ewm.comment.exception.CommentNotFoundException;
+import ru.practicum.ewm.comment.exception.UserNotCreatorCommentException;
+import ru.practicum.ewm.comment.model.Comment;
+import ru.practicum.ewm.comment.repository.CommentRepository;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.exception.*;
 import ru.practicum.ewm.event.model.*;
@@ -40,6 +47,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
     private final RequestRepository requestRepository;
+    private final CommentRepository commentRepository;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final StatsClient statsClient;
@@ -254,6 +262,75 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
+     * Добавление комментария пользователем
+     *
+     * @param userId  ID пользователя
+     * @param eventId ID комментария
+     * @param comment комментарий
+     * @return Добавленный комментарий
+     */
+    @Override
+    public CommentDto postComment(long userId, long eventId, NewCommentDto comment) {
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new UserNotFoundException(userId));
+        Event event = eventRepository.findByIdAndState(eventId, Status.PUBLISHED).orElseThrow(() ->
+                new EventNotFoundException(eventId));
+        return CommentMapper.toCommentDto(commentRepository.save(CommentMapper
+                .newCommentDtotoComment(comment, user, event)));
+    }
+
+    /**
+     * Изменение комментария
+     *
+     * @param userId        ID пользователя
+     * @param commentId     ID комментария
+     * @param newCommentDto Данные на изменения
+     * @return Изменённый комментарий
+     */
+    @Override
+    public CommentDto patchComment(long userId, long commentId, NewCommentDto newCommentDto) {
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new UserNotFoundException(userId));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()
+                -> new CommentNotFoundException(commentId));
+        if (!user.equals(comment.getAuthor())) {
+            throw new UserNotCreatorCommentException();
+        }
+        comment.setText(newCommentDto.getText());
+        return CommentMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    /**
+     * Удаление комментария
+     *
+     * @param userId    ID пользователя
+     * @param commentId ID комментария
+     */
+    @Override
+    public void deleteComment(long userId, long commentId) {
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new UserNotFoundException(userId));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()
+                -> new CommentNotFoundException(commentId));
+        if (!user.equals(comment.getAuthor())) {
+            throw new UserNotCreatorCommentException();
+        }
+        commentRepository.deleteById(commentId);
+    }
+
+    /**
+     * Удаление комментария админом
+     *
+     * @param commentId ID комментария
+     */
+    @Override
+    public void deleteCommentByAdmin(long commentId) {
+        commentRepository.findById(commentId).orElseThrow(()
+                -> new CommentNotFoundException(commentId));
+        commentRepository.deleteById(commentId);
+    }
+
+    /**
      * Поиск событий админом по критериям
      *
      * @param searchAdmin Критерии
@@ -441,5 +518,18 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now());
         eventRepository.save(event);
         return EventMapper.toEventFullDto(event);
+    }
+
+    /**
+     * Вывод комментариев события
+     *
+     * @param eventId ID события
+     * @return Комментарии события
+     */
+    @Override
+    public List<CommentDto> getComments(long eventId) {
+        eventRepository.findByIdAndState(eventId, Status.PUBLISHED).orElseThrow(() ->
+                new EventNotFoundException(eventId));
+        return CommentMapper.toCommentDto(commentRepository.findAllByEventIdOrderByCreatedDesc(eventId));
     }
 }

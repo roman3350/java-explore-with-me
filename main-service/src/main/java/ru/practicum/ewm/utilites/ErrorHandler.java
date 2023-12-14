@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.ewm.category.exception.CategoryNotEmptyException;
 import ru.practicum.ewm.category.exception.CategoryNotFoundException;
 import ru.practicum.ewm.category.exception.DuplicateCategoryNameException;
+import ru.practicum.ewm.comment.exception.CommentNotFoundException;
+import ru.practicum.ewm.comment.exception.UserNotCreatorCommentException;
 import ru.practicum.ewm.compilation.exception.CompilationNotFoundException;
 import ru.practicum.ewm.event.exception.*;
 import ru.practicum.ewm.request.exception.*;
@@ -15,7 +17,9 @@ import ru.practicum.ewm.user.exception.UserNotFoundException;
 
 @RestControllerAdvice
 public class ErrorHandler {
-    @ExceptionHandler({CategoryNotFoundException.class, CompilationNotFoundException.class, EventNotFoundException.class, RequestNotFound.class, UserNotFoundException.class})
+    @ExceptionHandler({CategoryNotFoundException.class, CompilationNotFoundException.class,
+            EventNotFoundException.class, RequestNotFound.class, UserNotFoundException.class,
+            CommentNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(Throwable e) {
         return new ErrorResponse(
@@ -23,11 +27,14 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler({UserNotInitiatorException.class, IncorrectParticipantLimitException.class, IncorrectStateActionException.class,
-            StatusNotConfirmedOrRejectedException.class, ChangePublishedEventException.class, ParticipantLimitReachedException.class,
-            StatusNotPendingException.class, DuplicateCategoryNameException.class, DuplicateUserNameException.class,
-            CategoryNotEmptyException.class, UserSentRequestCurrentEventException.class, UserInitiatorEventException.class,
-            EventNotPublishedException.class, NoEmptyPlaceEventException.class})
+    @ExceptionHandler({UserNotInitiatorException.class, IncorrectParticipantLimitException.class,
+            IncorrectStateActionException.class, StatusNotConfirmedOrRejectedException.class,
+            ChangePublishedEventException.class, ParticipantLimitReachedException.class,
+            StatusNotPendingException.class, DuplicateCategoryNameException.class,
+            DuplicateUserNameException.class, CategoryNotEmptyException.class,
+            UserSentRequestCurrentEventException.class, UserInitiatorEventException.class,
+            EventNotPublishedException.class, NoEmptyPlaceEventException.class,
+            UserNotCreatorCommentException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflictException(Throwable e) {
         return new ErrorResponse(e.getMessage());
